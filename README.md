@@ -1,4 +1,10 @@
 Crimena
 =======
 
-UDP Server
+Server for Minecraft: Pocket Edition
+
+Work in progress
+
+TODO
+----
+A LOT!
