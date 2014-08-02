@@ -1,8 +1,7 @@
 import os
 import time
 import struct
-import sys
-from .config.properties import Properties
+from crimena.config.properties import Properties
 from crimena.network.network import Network
 
 

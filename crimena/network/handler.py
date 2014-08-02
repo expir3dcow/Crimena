@@ -1,9 +1,6 @@
+import struct
 import time
 import binascii
-from crimena.network.protocol.raknet.raknet01 import RakNet01
-from crimena.network.protocol.raknet.raknet05 import RakNet05
-from crimena.network.protocol.raknet.raknet06 import RakNet06
-from crimena.network.protocol.raknet.raknet1c import RakNet1c
 
 
 class Handler(object):
@@ -16,41 +13,53 @@ class Handler(object):
         while True:
             if not queue.empty():
                 data, addr = queue.get()
-                print('R: \tbytes: {}\ndata: \t{!s}'.format(len(data), binascii.hexlify(data)))
+
                 # handle the data
-                self.handle_data(data, addr)
+                pid = data[0]
+                print('> R: bytes: {:>3}'.format(len(data)))
+                if 1 <= pid <= 8:
+                    print('raknet: {!s:>18}'.format(binascii.hexlify(data[:40])))
+                    self.handle_raknet(data, addr)
+                elif pid == 132:
+                    print('mcpe: {!s:>18}'.format(binascii.hexlify(data[:40])))
+                    self.handle_mcpe(data, addr)
+                else:
+                    print('yay new pid {}'.format(pid))  # TODO: check for more
 
                 queue.task_done()
             else:
-                time.sleep(.05) # todo: make it better xD
+                time.sleep(.1)  # todo: make it better
 
-    def handle_data(self, data, addr):
+    def handle_raknet(self, data, addr):
+        reply = None
         pid = data[0]
-        if pid == 1:
-            # get data from client packet
-            pkt_in = RakNet01()
+
+        packet_in = self.network.packets['raknet'].get(pid, None)
+        if packet_in:
+            pkt_in = getattr(packet_in['module'], packet_in['name'])(self.server)
             pkt_in.buffer = data
             pkt_in.decode()
+            reply = pkt_in.reply()
 
-            # make packet to send
-            pkt_out = RakNet1c()
-            pkt_out.ping_id = self.server.get_time_since_start()
-            pkt_out.server_id = 0
-            pkt_out.magic = pkt_in.magic
-            pkt_out.identifier = 'MCCPP;Demo;Hello World'
-            pkt_out.encode()
-            self.network.send_data(pkt_out.buffer, addr)
+        if reply:
+            for pid in reply:
+                packet_out = self.network.packets['raknet'].get(pid, None)
+                if packet_out:
+                    pkt_out = getattr(packet_out['module'], packet_out['name'])(self.server)
+                    dupes = list(set(dir(pkt_in)) & set(dir(pkt_out)))
+                    if 'client_port' in dir(pkt_out):
+                        pkt_out.__dict__['client_port'] = addr[1]
+                    for i in dupes:
+                        if not i.startswith('put') and not i.startswith('get') and not i.startswith('__') and not i.startswith('encode') and not i.startswith('decode') and not i.startswith('buffer') and not i.startswith('pid') and not i.startswith('reply') :
+                            pkt_out.__dict__[i] = pkt_in.__dict__[i]
+                    pkt_out.encode()
+                    self.network.send_raknet(pkt_out.buffer, addr)
 
-        elif pid == 5:
-            # get data from client packet
-            pkt_in = RakNet05()
-            pkt_in.buffer = data
-            pkt_in.decode()
+    def handle_mcpe(self, data, addr):
+        pid = data[0]
+        cnt = struct.unpack('i',data[1:4]+b'\x00')[0]
+        print(cnt)
 
-            # make packet to send
-            pkt_out = RakNet06()
-            pkt_out.magic = pkt_in.magic
-            pkt_out.server_id = self.server.server_id
-            pkt_out.mtu_size = pkt_in.mtu_size
-            pkt_out.encode()
-            self.network.send_data(pkt_out.buffer, addr)
+        pid = data[4]
+        print(pid, data[5:])
+        # TODO: the rest D:
