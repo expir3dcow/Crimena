@@ -1,27 +1,31 @@
 from crimena.network.protocol.packet import Packet
 
 
-class RakNet1c(Packet):
+class Raknet1c(Packet):
+    """ID_UNCONNECTED_PING_OPEN_CONNECTIONS
+    Structure
+        packet id: byte
+        ping_id: long
+        server_id: long
+        magic: 16 bytes
+        identifier: string
+    """
 
     ping_id = None
-    server_id = None
     magic = None
-    identifier = None
 
-    def __init__(self):
-        Packet.__init__(self)
+    def __init__(self, server):
+        Packet.__init__(self, server)
+
+    def encode(self):
+        self.put_byte(self.pid())
+        self.put_server_pingid()
+        self.put_serverid()
+        self.put_magic()
+        self.put_server_identifier()
 
     def decode(self):
         pass
 
-    def encode(self):
-        self.put_byte(self.get_pid())
-        self.put_long(self.ping_id)
-        self.put_long(self.server_id)
-        self.put_magic(self.magic)
-        self.put_string(self.identifier)
-
-    def get_pid(self):
+    def pid(self):
         return 28
-
-
