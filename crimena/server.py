@@ -14,7 +14,7 @@ class Server(object):
         # self.server_world = World()  # todo: make it work
         self.server_network = Network(self)
         self.isrunning = True
-        self.server_start_time = time.time()*1000
+        self.server_start_time = time.time() * 1000
         self.server_id = struct.unpack("!Q", os.urandom(8))[0]
 
     def start(self):
@@ -26,15 +26,7 @@ class Server(object):
 
         self.gameloop()
 
-        # self.server_network.stop()
-        # self.server_config.save()
-        pass
-
     def gameloop(self):
-        # command listener?
-        # tps?
-        # scheduler?
-        # events?
         while self.isrunning:
             time.sleep(10)
 
