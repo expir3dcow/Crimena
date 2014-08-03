@@ -1,19 +1,23 @@
+"""Packet info
+    name=ID_CONNECTED_PING_OPEN_CONNECTIONS
+    pid=1
+    reply=28
+"""
+
 from crimena.network.protocol.packet import Packet
 
 
 class Raknet01(Packet):
-    """ID_CONNECTED_PING_OPEN_CONNECTIONS
-    Structure
-        packet id: byte
+    """Packet structure
+        packet_id: byte
         ping_id: long
         magic: 16 bytes
     """
 
-    ping_id = None
-    magic = None
-
     def __init__(self, server):
         Packet.__init__(self, server)
+        self.ping_id = None
+        self.magic = None
 
     def encode(self):
         pass
@@ -26,5 +30,6 @@ class Raknet01(Packet):
     def pid(self):
         return 1
 
-    def reply(self):
-        return [28]
+
+def init(server):
+    return Raknet01(server)

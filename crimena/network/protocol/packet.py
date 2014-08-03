@@ -11,18 +11,17 @@ class Packet(object):
 
     @abc.abstractmethod
     def encode(self):
+        """Encode data before sending"""
         pass
 
     @abc.abstractmethod
     def decode(self):
+        """Decode received data"""
         pass
 
     @abc.abstractmethod
     def pid(self):
-        return 254
-
-    @abc.abstractmethod
-    def reply(self):
+        """Returns the packet ID"""
         return None
 
     def get(self, length=-1):
@@ -39,7 +38,7 @@ class Packet(object):
         return unpack('>B', self.get(1))[0]
 
     def put_byte(self, i):
-        self.buffer.extend(pack('>B',i))
+        self.buffer.extend(pack('>B', i))
 
     def get_short(self):
         return unpack('>H', self.get(2))[0]

@@ -1,10 +1,16 @@
+import inspect
+import logging
 import os
 from queue import Queue
 import re
 import socket
 import threading
-from crimena.network.handler import Handler
 import importlib.abc
+
+from crimena.network.handler import Handler
+
+
+log = logging.getLogger('debug')
 
 
 class Network(threading.Thread):
@@ -13,19 +19,22 @@ class Network(threading.Thread):
     def __init__(self, server):
         super(Network, self).__init__()
         self.daemon = True
+        self.name = "Network"
+
+        self.packets = {}
+        self.data_in = Queue()
+
         self.server = server
         self.server_ip = '0.0.0.0'
         self.server_port = self.server.server_config.get('port', 19132)
-
-        self.packets = self.load_packets()
-        print('Loaded {} raknet and {} mcpe packets'.format(len(self.packets['raknet']), len(self.packets['mcpe'])))
-
-        self.data_in = Queue()
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind((self.server_ip, self.server_port))
 
     def run(self):
+        self.packets = self.load_packets()
+        log.debug('Loaded {} raknet and {} mcpe packets'.format(len(self.packets['raknet']), len(self.packets['mcpe'])))
+
         t = threading.Thread(target=Handler, args=([self, self.server, self.data_in, ]))
         t.daemon = True
         t.start()
@@ -40,33 +49,39 @@ class Network(threading.Thread):
         self.sock.sendto(buffer, addr)
 
     def stop(self):
-        print('Stopping Network socket')
+        log.info('Stopping Network socket')
         self.sock.close()
 
     def load_packets(self):
         packets = {'raknet': {}, 'mcpe': {}}
-        for t in packets:
-            pysearchre = re.compile('^[a-z].*.py$', re.IGNORECASE)
-            print(os.path.join(os.path.dirname(__file__),
-                               'protocol', t))
+        packet_info = ['name', 'pid', 'reply']
+        importlib.import_module('.protocol', package='crimena.network')
+
+        pysearchre = re.compile('^[^_].*\.py$',)
+        for packet in packets:
+            importlib.import_module('.'+packet, package='crimena.network.protocol')
+
             pluginfiles = filter(pysearchre.search,
                                  os.listdir(os.path.join(os.path.dirname(__file__),
-                                                         'protocol', t)))
+                                                         'protocol', packet)))
             form_module = lambda fp: '.' + os.path.splitext(fp)[0]
             plugins = map(form_module, pluginfiles)
 
-            importlib.import_module('.protocol', package='crimena.network')
-            importlib.import_module('.' + t, package='crimena.network.protocol')
+            for p in plugins:
+                mod = importlib.import_module(p, package=''.join("crimena.network.protocol." + packet))
+                info = {'obj': mod.init(self.server)}
 
-            for plugin in plugins:
-                if not plugin.startswith('__'):
-                    clz_name = plugin.lstrip('.').capitalize()
-                    mod = importlib.import_module(plugin, package="crimena.network.protocol." + t)
-                    print(clz_name)  # Debug
-                    new_clz = getattr(mod, clz_name)(self.server)
-                    packets[t][new_clz.pid()] = packets[t].get(new_clz.pid(), {
-                        'name': clz_name,
-                        'pid': new_clz.pid(),
-                        'module': mod,
-                    })
+                doc_splitted = inspect.getdoc(mod).split('\n')
+                for line in doc_splitted:
+                    if not line.startswith("#"):
+                        line = line.split('=')
+                        if len(line) > 1 and line[0] in packet_info:
+                            if line[0] == 'reply':
+                                info[line[0]] = info.get(line[0], line[1].split(','))
+                            elif line[1].isdigit():
+                                info[line[0]] = info.get(line[0], int(line[1]))
+                            else:
+                                info[line[0]] = info.get(line[0], line[1])
+                # log.debug('%s[%s] <- %s', packet, info['pid'], info)
+                packets[packet][info['pid']] = info
         return packets

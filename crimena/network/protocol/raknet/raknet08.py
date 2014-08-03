@@ -1,10 +1,14 @@
+"""Packet info
+    name=ID_OPEN_CONNECTION_REPLY_2
+    pid=8
+"""
+
 from crimena.network.protocol.packet import Packet
 
 
 class Raknet08(Packet):
-    """ID_OPEN_CONNECTION_REPLY_2
-    Structure
-        packet id: byte
+    """Packet structure
+        packet_id: byte
         magic: 16 bytes
         server_id: long
         client_port: short
@@ -12,12 +16,11 @@ class Raknet08(Packet):
         security: byte
     """
 
-    client_port = None
-    mtu_size = None
-    magic = None
-
     def __init__(self, server):
         Packet.__init__(self, server)
+        self.client_port = None
+        self.mtu_size = None
+        self.magic = None
 
     def encode(self):
         self.put_pid()
@@ -32,3 +35,7 @@ class Raknet08(Packet):
 
     def pid(self):
         return 8
+
+
+def init(server):
+    return Raknet08(server)

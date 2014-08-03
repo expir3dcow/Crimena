@@ -1,6 +1,12 @@
+import inspect
+import logging
+import re
 import struct
 import time
 import binascii
+
+log = logging.getLogger('debug')
+repktinfo = re.compile('^[^#].+:',)
 
 
 class Handler(object):
@@ -16,50 +22,60 @@ class Handler(object):
 
                 # handle the data
                 pid = data[0]
-                print('> R: bytes: {:>3}'.format(len(data)))
                 if 1 <= pid <= 8:
-                    print('raknet: {!s:>18}'.format(binascii.hexlify(data[:40])))
+                    log.debug('> R: size: %s raknet: %s', len(data), binascii.hexlify(data[:40]))
                     self.handle_raknet(data, addr)
                 elif pid == 132:
-                    print('mcpe: {!s:>18}'.format(binascii.hexlify(data[:40])))
+                    log.debug('> R: size: %s mcpe: %s', len(data), binascii.hexlify(data[:40]))
                     self.handle_mcpe(data, addr)
                 else:
-                    print('yay new pid {}'.format(pid))  # TODO: check for more
+                    log.debug('yay new pid {}'.format(pid))  # TODO: check for more
 
                 queue.task_done()
             else:
-                time.sleep(.1)  # todo: make it better
+                time.sleep(.1)  # TODO: make it better
 
     def handle_raknet(self, data, addr):
         reply = None
         pid = data[0]
 
-        packet_in = self.network.packets['raknet'].get(pid, None)
+        packet_in = self.network.packets['raknet'].get(int(pid), None)
         if packet_in:
-            pkt_in = getattr(packet_in['module'], packet_in['name'])(self.server)
+            pkt_in = packet_in['obj']
             pkt_in.buffer = data
             pkt_in.decode()
-            reply = pkt_in.reply()
+            reply = packet_in['reply']
 
         if reply:
+            doc_in = inspect.getdoc(pkt_in).split('\n')
+            doc_in_filter = filter(repktinfo.search, doc_in)
+
             for pid in reply:
-                packet_out = self.network.packets['raknet'].get(pid, None)
+                packet_out = self.network.packets['raknet'].get(int(pid), None)
                 if packet_out:
-                    pkt_out = getattr(packet_out['module'], packet_out['name'])(self.server)
-                    dupes = list(set(dir(pkt_in)) & set(dir(pkt_out)))
-                    if 'client_port' in dir(pkt_out):
-                        pkt_out.__dict__['client_port'] = addr[1]
+                    log.debug('send back: %s', packet_out['name'])
+                    pkt_out = packet_out['obj']
+
+                    doc_out = inspect.getdoc(pkt_out).split('\n')
+                    doc_out_filter = filter(repktinfo.search, doc_out)
+
+                    dupes = list(set(doc_in_filter) & set(doc_out_filter))
                     for i in dupes:
-                        if not i.startswith('put') and not i.startswith('get') and not i.startswith('__') and not i.startswith('encode') and not i.startswith('decode') and not i.startswith('buffer') and not i.startswith('pid') and not i.startswith('reply') :
-                            pkt_out.__dict__[i] = pkt_in.__dict__[i]
+                        if 'packet_id' not in i and len(i) > 0:
+                            atr = i.split(':')[0]
+                            g = getattr(pkt_in, atr)
+                            setattr(pkt_out, atr, g)
+
+                    if packet_out['pid'] == 8:
+                        setattr(pkt_out, 'client_port', addr[1])
+
                     pkt_out.encode()
                     self.network.send_raknet(pkt_out.buffer, addr)
 
     def handle_mcpe(self, data, addr):
         pid = data[0]
         cnt = struct.unpack('i',data[1:4]+b'\x00')[0]
-        print(cnt)
 
         pid = data[4]
-        print(pid, data[5:])
+        log.debug('%d', pid)
         # TODO: the rest D:
