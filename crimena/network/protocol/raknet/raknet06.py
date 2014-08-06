@@ -1,8 +1,3 @@
-"""Packet info
-    name=ID_OPEN_CONNECTION_REPLY_1
-    pid=6
-"""
-
 from crimena.network.protocol.packet import Packet
 
 
@@ -36,3 +31,10 @@ class Raknet06(Packet):
 
 def init(server):
     return Raknet06(server)
+
+
+def info():
+    return {
+        'pid': 6,
+        'fields': ['magic', 'mtu_size'],
+    }

@@ -1,8 +1,3 @@
-"""Packet info
-    name=ID_UNCONNECTED_PING_OPEN_CONNECTIONS
-    pid=28
-"""
-
 from crimena.network.protocol.packet import Packet
 
 
@@ -36,3 +31,10 @@ class Raknet1c(Packet):
 
 def init(server):
     return Raknet1c(server)
+
+
+def info():
+    return {
+        'pid': 28,
+        'fields': ['magic'],
+    }

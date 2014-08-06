@@ -2,7 +2,6 @@ import struct
 
 
 class Mcpepacket(object):
-
     def __init__(self, data):
         self.data = data
         self.pid = self.data[0]
@@ -15,7 +14,7 @@ class Mcpepacket(object):
             encid = self.data[0]
             print(encid)
 
-            length = int(struct.unpack('>H', self.data[1:3])[0]/8.)
+            length = int(struct.unpack('>H', self.data[1:3])[0] / 8.)
             print(length)
 
             if encid == 64:

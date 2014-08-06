@@ -1,5 +1,6 @@
 import abc
-from struct import unpack, pack
+
+from crimena.utils import binutils
 
 
 class Packet(object):
@@ -24,6 +25,9 @@ class Packet(object):
         """Returns the packet ID"""
         return None
 
+    def __tostr__(self):
+        return self.__name__
+
     def get(self, length=-1):
         if length > 0:
             r = self.buffer[:length]
@@ -35,35 +39,35 @@ class Packet(object):
             return r
 
     def get_byte(self):
-        return unpack('>B', self.get(1))[0]
+        return binutils.get_byte(self.get(1))
 
     def put_byte(self, i):
-        self.buffer.extend(pack('>B', i))
+        self.buffer.extend(binutils.put_byte(i))
 
     def get_short(self):
-        return unpack('>H', self.get(2))[0]
+        return binutils.get_short(self.get(2))
 
     def put_short(self, i):
-        self.buffer.extend(pack('>H', i))
+        self.buffer.extend(binutils.put_short(i))
 
     def get_long(self):
-        return unpack('>Q', self.get(8))[0]
+        return binutils.get_long(self.get(8))
 
     def put_long(self, i):
-        self.buffer.extend(pack('>Q', i))
+        self.buffer.extend(binutils.put_long(i))
 
     def get_magic(self):
-        return unpack('>16s', self.get(16))[0]
+        return self.get(16)
 
     def put_magic(self):
         self.buffer.extend(self.magic)
 
     def get_string(self):
-        return self.get(self.get_short())
+        length = binutils.get_short(self.get(2))
+        return binutils.get_short(self.get(length))
 
     def put_string(self, i):
-        self.put_short(len(i))
-        self.buffer.extend(i.encode())
+        self.buffer.extend(binutils.put_string(i))
 
     # Custom stuff
     def put_pid(self):
@@ -73,7 +77,7 @@ class Packet(object):
         self.put_long(self.server.server_id)
 
     def put_server_pingid(self):
-        self.put_long(self.server.get_time_since_start())
+        self.buffer.extend(binutils.put_long(self.server.get_time_since_start()))
 
     def put_server_identifier(self):
-        self.put_string("MCCPP;Demo;Crimena")  # TODO: load from config
+        self.buffer.extend(binutils.put_string("MCCPP;Demo;Crimena"))  # TODO: load from config
