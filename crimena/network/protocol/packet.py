@@ -39,6 +39,9 @@ class Packet(object):
             self.buffer = bytearray()
             return r
 
+    def put(self, i):
+        self.buffer.extend(i)
+
     # byte
     def get_byte(self):
         return binutils.get_byte(self.get(1))
@@ -57,8 +60,8 @@ class Packet(object):
     def get_triad(self):
         return binutils.get_triad(self.get(3))
 
-    def put_triad(self, i):
-        self.buffer.extend(binutils.put_triad(i))
+    def put_triad(self, i, big=True):
+        self.buffer.extend(binutils.put_triad(i, big))
 
     # int
     def get_int(self):
@@ -95,9 +98,6 @@ class Packet(object):
         self.buffer.extend(binutils.put_string(i))
 
     # Custom stuff
-    def put_pid(self):
-        self.put_byte(self.pid())
-
     def put_serverid(self):
         self.put_long(self.server.server_id)
 

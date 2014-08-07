@@ -1,36 +1,40 @@
 from crimena.network.protocol.packet import Packet
 
+info = {'pid': 16}
+
 
 class ServerHandshake(Packet):
 
     def __init__(self, data):
         Packet.__init__(self, data)
+        self.security = None
+        self.cookie = None
+        self.port = None
+        self.session1 = None
+        self.session2 = None
 
     def encode(self):
-        pass
+        self.put_byte(info['pid'])
+
+        self.put_byte(self.security)
+        self.put_int(self.cookie)
+        self.put_short(self.port)
+        self.put(b'\x00\x00\x04\xff\xff\xff\xff'*10)
+        self.put_byte(1)
+        self.put_long(self.session1)
+        self.put_long(self.session2)
 
     def decode(self):
-        security = self.get_byte()
-        cookie = self.get_int()
-        port = self.get_short()
+        self.security = self.get_byte()
+        self.cookie = self.get_int()
+        self.port = self.get_short()
         for i in range(0, 10):
             self.get(3)
             self.get(4)
-        security_flag = self.get(1)
-        session1 = self.get_long()
-        session2 = self.get_long()
-
-        self.debug.append(['security', security])
-        self.debug.append(['cookie', cookie])
-        self.debug.append(['port', port])
-        # self.debug.append(['security_flag', security_flag])  # FIXME: make it work
-        self.debug.append(['session1', session1])
-        self.debug.append(['session2', session2])
+        self.get(1)
+        self.session1 = self.get_long()
+        self.session2 = self.get_long()
 
 
 def init(data):
     return ServerHandshake(data)
-
-
-def info():
-    return {'pid': 16}

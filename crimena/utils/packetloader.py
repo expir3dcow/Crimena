@@ -20,6 +20,6 @@ def load_packets():
         package_name = "crimena.network.protocol." + packet
         for p in packets_map:
             mod = importlib.import_module(p, package=package_name)
-            pinfo = mod.info()
+            pinfo = mod.info
             packets[packet][pinfo['pid']] = {'mod': mod, 'info': pinfo}
     return packets

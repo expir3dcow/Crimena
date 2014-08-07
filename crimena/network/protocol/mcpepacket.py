@@ -1,6 +1,8 @@
 import binascii
 import logging
+
 from crimena.utils import binutils
+
 
 log = logging.getLogger('debug')
 

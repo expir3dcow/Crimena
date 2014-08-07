@@ -1,32 +1,36 @@
 from crimena.network.protocol.packet import Packet
 
+info = {'pid': 164}
+
 
 class PlayerAction(Packet):
     def __init__(self, data):
         Packet.__init__(self, data)
+        self.action = None
+        self.x = None
+        self.y = None
+        self.z = None
+        self.face = None
+        self.entity_id = None
 
     def encode(self):
-        pass
+        self.put_byte(info['pid'])
+
+        self.put_int(self.action)
+        self.put_int(self.x)
+        self.put_int(self.y)
+        self.put_int(self.z)
+        self.put_int(self.face)
+        self.put_int(self.entity_id)
+
 
     def decode(self):
-        action = self.get_int()
-        x = self.get_int()
-        y = self.get_int()
-        z = self.get_int()
-        face = self.get_int()
-        entity_id = self.get_int()
-
-        self.debug.append(['action', action])
-        self.debug.append(['x', x])
-        self.debug.append(['y', y])
-        self.debug.append(['z', z])
-        self.debug.append(['face', face])
-        self.debug.append(['entity_id', entity_id])
+        self.action = self.get_int()
+        self.x = self.get_int()
+        self.y = self.get_int()
+        self.z = self.get_int()
+        self.face = self.get_int()
 
 
 def init(data):
     return PlayerAction(data)
-
-
-def info():
-    return {'pid': 164}

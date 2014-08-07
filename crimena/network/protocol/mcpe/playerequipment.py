@@ -1,28 +1,30 @@
 from crimena.network.protocol.packet import Packet
 
+info = {'pid': 160}
+
 
 class PlayerEquipment(Packet):
     def __init__(self, data):
         Packet.__init__(self, data)
+        self.entity_id = None
+        self.item = None
+        self.meta = None
+        self.slot = None
 
     def encode(self):
-        pass
+        self.put_byte(info['pid'])
+
+        self.put_int(self.entity_id)
+        self.put_short(self.item)
+        self.put_short(self.meta)
+        self.put_byte(self.slot)
 
     def decode(self):
-        entity_id = self.get_int()
-        item = self.get_short()
-        meta = self.get_short()
-        slot = self.get_byte()
-
-        self.debug.append(['entity_id', entity_id])
-        self.debug.append(['item', item])
-        self.debug.append(['meta', meta])
-        self.debug.append(['slot', slot])
+        self.entity_id = self.get_int()
+        self.item = self.get_short()
+        self.meta = self.get_short()
+        self.slot = self.get_byte()
 
 
 def init(data):
     return PlayerEquipment(data)
-
-
-def info():
-    return {'pid': 160}

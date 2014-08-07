@@ -1,5 +1,11 @@
 from crimena.network.protocol.packet import Packet
 
+info = {
+        'pid': 1,
+        'reply': [28],
+        'fields': ['ping_id', 'magic'],
+    }
+
 
 class Raknet01(Packet):
     """Packet structure
@@ -21,17 +27,6 @@ class Raknet01(Packet):
         self.ping_id = self.get_long()
         self.magic = self.get_magic()
 
-    def pid(self):
-        return 1
-
 
 def init(server):
     return Raknet01(server)
-
-
-def info():
-    return {
-        'pid': 1,
-        'reply': [28],
-        'fields': ['ping_id', 'magic'],
-    }

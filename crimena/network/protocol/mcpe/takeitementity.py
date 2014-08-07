@@ -1,24 +1,24 @@
 from crimena.network.protocol.packet import Packet
 
+info = {'pid': 143}
+
 
 class TakeItemEntity(Packet):
     def __init__(self, data):
         Packet.__init__(self, data)
+        self.target_id = None
+        self.entity_id = None
 
     def encode(self):
-        pass
+        self.put_byte(info['pid'])
+
+        self.put_int(self.target_id)
+        self.put_int(self.entity_id)
 
     def decode(self):
-        target = self.get_int()
-        entity_id = self.get_int()
-
-        self.debug.append(['target', target])
-        self.debug.append(['entity_id', entity_id])
+        self.target_id = self.get_int()
+        self.entity_id = self.get_int()
 
 
 def init(data):
     return TakeItemEntity(data)
-
-
-def info():
-    return {'pid': 143}

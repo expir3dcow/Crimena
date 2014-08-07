@@ -1,25 +1,27 @@
 from crimena.network.protocol.packet import Packet
 
+info = {'pid': 134}
+
 
 class SetTime(Packet):
 
     def __init__(self, data):
         Packet.__init__(self, data)
+        self.time = None
+        self.started = None
 
     def encode(self):
-        pass
+        self.put_byte(info['pid'])
+
+        self.put_int(self.time)
+        if self.started:
+            self.put_byte(self.started)
 
     def decode(self):
-        time = self.get_int()
-        self.debug.append(['time', time])
+        self.time = self.get_int()
         if len(self.data) > 0:
-            started = self.get_byte()
-            self.debug.append(['started', started])
+            self.started = self.get_byte()
 
 
 def init(data):
     return SetTime(data)
-
-
-def info():
-    return {'pid': 134}

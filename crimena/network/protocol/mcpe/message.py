@@ -1,24 +1,24 @@
 from crimena.network.protocol.packet import Packet
 
+info = {'pid': 133}
+
 
 class Message(Packet):
     def __init__(self, data):
         Packet.__init__(self, data)
+        self.source = None
+        self.message = None
 
     def encode(self):
-        pass
+        self.put_byte(info['pid'])
+
+        self.put_string(self.source)
+        self.put_string(self.message)
 
     def decode(self):
-        source = self.get_string()
-        message = self.get_string()
-
-        self.debug.append(['source', source])
-        self.debug.append(['message', message])
+        self.source = self.get_string()
+        self.message = self.get_string()
 
 
 def init(data):
     return Message(data)
-
-
-def info():
-    return {'pid': 133}

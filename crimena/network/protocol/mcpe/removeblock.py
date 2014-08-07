@@ -1,28 +1,30 @@
 from crimena.network.protocol.packet import Packet
 
+info = {'pid': 151}
+
 
 class RemoveBlock(Packet):
     def __init__(self, data):
         Packet.__init__(self, data)
+        self.entity_id = None
+        self.x = None
+        self.z = None
+        self.y = None
 
     def encode(self):
-        pass
+        self.put_byte(info['pid'])
+
+        self.put_int(self.entity_id)
+        self.put_int(self.x)
+        self.put_int(self.z)
+        self.put_byte(self.y)
 
     def decode(self):
-        entity_id = self.get_int()
-        x = self.get_int()
-        z = self.get_int()
-        y = self.get_byte()
-
-        self.debug.append(['entity_id', entity_id])
-        self.debug.append(['x', x])
-        self.debug.append(['y', y])
-        self.debug.append(['z', z])
+        self.entity_id = self.get_int()
+        self.x = self.get_int()
+        self.z = self.get_int()
+        self.y = self.get_byte()
 
 
 def init(data):
     return RemoveBlock(data)
-
-
-def info():
-    return {'pid': 151}

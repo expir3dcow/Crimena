@@ -1,43 +1,52 @@
 from crimena.network.protocol.packet import Packet
 
+info = {'pid': 137}
+
 
 class AddPlayer(Packet):
 
     def __init__(self, data):
         Packet.__init__(self, data)
+        self.client_id = None
+        self.username = None
+        self.entity_id = None
+        self.x = None
+        self.y = None
+        self.z = None
+        self.yaw = None
+        self.pitch = None
+        self.unknown1 = None
+        self.unknown2 = None
+        self.metadata = None
 
     def encode(self):
-        pass
+        self.put_byte(info['pid'])
+
+        self.put_long(self.client_id)
+        self.put_string(self.username)
+        self.put_int(self.entity_id)
+        self.put_float(self.x)
+        self.put_float(self.y)
+        self.put_float(self.z)
+        self.put_byte(self.yaw)
+        self.put_byte(self.pitch)
+        self.put_short(self.unknown1)
+        self.put_short(self.unknown2)
+        self.put_metadata(self.metadata)  # TODO: make it work
 
     def decode(self):
-        client_id = self.get_long()
-        username = self.get_string()
-        entity_id = self.get_int()
-        x = self.get_float()
-        y = self.get_float()
-        z = self.get_float()
-        yaw = self.get_byte()
-        pitch = self.get_byte()
-        unknown1 = self.get_short()
-        unknown2 = self.get_short()
-        metadata = self.get_metadata()
-
-        self.debug.append(['client_id', str(client_id)])
-        self.debug.append(['username', username])
-        self.debug.append(['entity_id', str(entity_id)])
-        self.debug.append(['x', str(x)])
-        self.debug.append(['y', str(y)])
-        self.debug.append(['z', str(z)])
-        self.debug.append(['yaw', str(yaw)])
-        self.debug.append(['pitch', str(pitch)])
-        self.debug.append(['unknown1', str(unknown1)])
-        self.debug.append(['unknown2', str(unknown2)])
-        # self.debug.append(['metadata', binascii.hexlify(metadata)])  # FIXME: make it work
+        self.client_id = self.get_long()
+        self.username = self.get_string()
+        self.entity_id = self.get_int()
+        self.x = self.get_float()
+        self.y = self.get_float()
+        self.z = self.get_float()
+        self.yaw = self.get_byte()
+        self.pitch = self.get_byte()
+        self.unknown1 = self.get_short()
+        self.unknown2 = self.get_short()
+        self.metadata = self.get_metadata()
 
 
 def init(data):
     return AddPlayer(data)
-
-
-def info():
-    return {'pid': 137}

@@ -1,35 +1,40 @@
 from crimena.network.protocol.packet import Packet
 
+info = {'pid': 149}
+
 
 class MovePlayer(Packet):
 
     def __init__(self, data):
         Packet.__init__(self, data)
+        self.entity_id = None
+        self.x = None
+        self.y = None
+        self.z = None
+        self.yaw = None
+        self.pitch = None
+        self.body_yaw = None
 
     def encode(self):
-        pass
+        self.put_byte(info['pid'])
+
+        self.put_int(self.entity_id)
+        self.put_float(self.x)
+        self.put_float(self.y)
+        self.put_float(self.z)
+        self.put_float(self.yaw)
+        self.put_float(self.pitch)
+        self.put_float(self.body_yaw)
 
     def decode(self):
-        entity_id = self.get_int()
-        x = self.get_float()
-        y = self.get_float()
-        z = self.get_float()
-        yaw = self.get_float()
-        pitch = self.get_float()
-        body_yaw = self.get_float()
-
-        self.debug.append(['entity_id', entity_id])
-        self.debug.append(['x', x])
-        self.debug.append(['y', y])
-        self.debug.append(['z', z])
-        self.debug.append(['yaw', yaw])
-        self.debug.append(['pitch', pitch])
-        self.debug.append(['body_yaw', body_yaw])
+        self.entity_id = self.get_int()
+        self.x = self.get_float()
+        self.y = self.get_float()
+        self.z = self.get_float()
+        self.yaw = self.get_float()
+        self.pitch = self.get_float()
+        self.body_yaw = self.get_float()
 
 
 def init(data):
     return MovePlayer(data)
-
-
-def info():
-    return {'pid': 149}

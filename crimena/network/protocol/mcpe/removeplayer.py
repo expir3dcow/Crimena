@@ -1,24 +1,24 @@
 from crimena.network.protocol.packet import Packet
 
+info = {'pid': 138}
+
 
 class RemovePlayer(Packet):
     def __init__(self, data):
         Packet.__init__(self, data)
+        self.entity_id = None
+        self.client_id = None
 
     def encode(self):
-        pass
+        self.put_byte(info['pid'])
+
+        self.put_int(self.entity_id)
+        self.put_long(self.client_id)
 
     def decode(self):
-        entity_id = self.get_int()
-        client_id = self.get_long()
-
-        self.debug.append(['entity_id', entity_id])
-        self.debug.append(['client_id', client_id])
+        self.entity_id = self.get_int()
+        self.client_id = self.get_long()
 
 
 def init(data):
     return RemovePlayer(data)
-
-
-def info():
-    return {'pid': 138}

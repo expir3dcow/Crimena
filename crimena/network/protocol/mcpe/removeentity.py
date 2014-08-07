@@ -1,22 +1,21 @@
 from crimena.network.protocol.packet import Packet
 
+info = {'pid': 141}
+
 
 class RemoveEntity(Packet):
     def __init__(self, data):
         Packet.__init__(self, data)
+        self.entity_id = None
 
     def encode(self):
-        pass
+        self.put_byte(info['pid'])
+
+        self.put_int(self.entity_id)
 
     def decode(self):
-        entity_id = self.get_int()
-
-        self.debug.append(['entity_id', entity_id])
+        self.entity_id = self.get_int()
 
 
 def init(data):
     return RemoveEntity(data)
-
-
-def info():
-    return {'pid': 141}

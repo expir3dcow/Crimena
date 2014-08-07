@@ -1,5 +1,10 @@
 from crimena.network.protocol.packet import Packet
 
+info = {
+        'pid': 6,
+        'fields': ['magic', 'mtu_size'],
+    }
+
 
 class Raknet06(Packet):
     """Packet structure
@@ -16,7 +21,7 @@ class Raknet06(Packet):
         self.mtu_size = None
 
     def encode(self):
-        self.put_pid()
+        self.put_byte(info['pid'])
         self.put_magic()
         self.put_serverid()
         self.put_byte(0)
@@ -25,16 +30,6 @@ class Raknet06(Packet):
     def decode(self):
         pass
 
-    def pid(self):
-        return 6
-
 
 def init(server):
     return Raknet06(server)
-
-
-def info():
-    return {
-        'pid': 6,
-        'fields': ['magic', 'mtu_size'],
-    }

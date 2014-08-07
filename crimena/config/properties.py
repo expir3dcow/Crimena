@@ -1,4 +1,5 @@
 import time
+
 from crimena.config.config import Config
 
 

@@ -1,5 +1,7 @@
-import crimena
 from crimena.entity.entity import Entity, get_server
+
+# TODO: save player
+# TODO: load player
 
 
 class Player(Entity):

@@ -1,28 +1,26 @@
 from crimena.network.protocol.packet import Packet
 
+info = {'pid': 173}
+
 
 class Respawn(Packet):
     def __init__(self, data):
         Packet.__init__(self, data)
 
     def encode(self):
-        pass
+        self.put_byte(info['pid'])
+
+        self.put_int(self.entity_id)
+        self.put_float(self.x)
+        self.put_float(self.y)
+        self.put_float(self.z)
 
     def decode(self):
-        entity_id = self.get_int()
-        x = self.get_float()
-        y = self.get_float()
-        z = self.get_float()
-
-        self.debug.append(['entity_id', entity_id])
-        self.debug.append(['x', x])
-        self.debug.append(['y', y])
-        self.debug.append(['z', z])
+        self.entity_id = self.get_int()
+        self.x = self.get_float()
+        self.y = self.get_float()
+        self.z = self.get_float()
 
 
 def init(data):
     return Respawn(data)
-
-
-def info():
-    return {'pid': 173}

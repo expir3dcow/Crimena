@@ -1,27 +1,23 @@
-import zlib
-
 from crimena.network.protocol.packet import Packet
 
+info = {'pid': 186}
 
+
+# TODO: make it work
 class FullChunkData(Packet):
 
     def __init__(self, data):
         Packet.__init__(self, data)
+        self.packed_chunk = None
 
     def encode(self):
-        pass
+        self.put_byte(info['pid'])
+
+        self.put(self.packed_chunk)
 
     def decode(self):
-        packed_chunk = self.get()
-
-        dc = zlib.decompressobj(zlib.MAX_WBITS)
-        self.chunk = dc.decompress(packed_chunk)
-        self.debug.append(['packed_chunk size', len(packed_chunk)])
+        self.packed_chunk = self.get()
 
 
 def init(data):
     return FullChunkData(data)
-
-
-def info():
-    return {'pid': 186}

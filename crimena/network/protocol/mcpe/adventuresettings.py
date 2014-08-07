@@ -1,22 +1,21 @@
 from crimena.network.protocol.packet import Packet
 
+info = {'pid': 183}
+
 
 class AdventureSettings(Packet):
     def __init__(self, data):
         Packet.__init__(self, data)
+        self.flags = None
 
     def encode(self):
-        pass
+        self.put_byte(info['pid'])
+
+        self.put_int(self.flags)
 
     def decode(self):
-        flags = self.get_int()
-
-        self.debug.append(['flags', flags])
+        self.flags = self.get_int()
 
 
 def init(data):
     return AdventureSettings(data)
-
-
-def info():
-    return {'pid': 183}

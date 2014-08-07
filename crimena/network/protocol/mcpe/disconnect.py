@@ -1,20 +1,18 @@
 from crimena.network.protocol.packet import Packet
 
+info = {'pid': 21}
+
 
 class Disconnect(Packet):
     def __init__(self, data):
         Packet.__init__(self, data)
 
     def encode(self):
-        pass
+        self.put_byte(self.pid())
 
     def decode(self):
-        self.debug.append(['Disconnected', True])
+        pass
 
 
 def init(data):
     return Disconnect(data)
-
-
-def info():
-    return {'pid': 21}

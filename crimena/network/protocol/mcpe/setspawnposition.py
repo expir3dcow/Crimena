@@ -1,27 +1,28 @@
 from crimena.network.protocol.packet import Packet
 
+info = {'pid': 171}
+
 
 class SetSpawnPosition(Packet):
 
     def __init__(self, data):
         Packet.__init__(self, data)
+        self.x = None
+        self.y = None
+        self.z = None
 
     def encode(self):
-        pass
+        self.put_byte(info['pid'])
+
+        self.put_int(self.x)
+        self.put_int(self.z)
+        self.put_byte(self.y)
 
     def decode(self):
-        x = self.get_int()
-        z = self.get_int()
-        y = self.get_byte()
-
-        self.debug.append(['x', x])
-        self.debug.append(['y', y])
-        self.debug.append(['z', z])
+        self.x = self.get_int()
+        self.z = self.get_int()
+        self.y = self.get_byte()
 
 
 def init(data):
     return SetSpawnPosition(data)
-
-
-def info():
-    return {'pid': 171}

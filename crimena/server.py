@@ -2,11 +2,13 @@ import logging
 import os
 import time
 import struct
+
 from crimena.config.properties import Properties
 from crimena.entity.handler import EntityHandler
 from crimena.network.network import Network
 from crimena.utils.logger import setup_logger
 from crimena.utils.singleton import Singleton
+
 
 log = logging.getLogger('Crimena')
 

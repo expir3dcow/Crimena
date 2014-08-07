@@ -1,5 +1,7 @@
 import logging
+
 from crimena.entity.player import Player
+
 
 log = logging.getLogger('crimena')
 
