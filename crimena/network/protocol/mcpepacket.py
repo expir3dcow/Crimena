@@ -1,27 +1,36 @@
-import struct
+import binascii
+import logging
+from crimena.utils import binutils
 
+log = logging.getLogger('debug')
 
-class Mcpepacket(object):
-    def __init__(self, data):
-        self.data = data
-        self.pid = self.data[0]
-        self.count = struct.unpack('>i', data[1:4] + b'\x00')[0]
-        self.data = self.data[4:]
+def decapsulate(data):
+    # log.debug(binascii.hexlify(data))
 
-    def unpack(self):
-        # TODO: make it work
-        while self.data:
-            encid = self.data[0]
-            print(encid)
+    packet_count = binutils.get_triad(data[1:4], False)  # TODO: return me!
+    data = data[4:]
 
-            length = int(struct.unpack('>H', self.data[1:3])[0] / 8.)
-            print(length)
+    # decapsulate here. loop until no data
+    packets = []
+    data_count = []
+    while len(data) > 0:
+        enc_id = data[0]
+        length = binutils.get_short(data[1:3])
+        data = data[3:]
 
-            if encid == 64:
-                count = struct.unpack('>i', self.data[3:6] + b'\x00')[0]
-                self.data = self.data[6:]
-            else:
-                print('Add me {}'.format(encid))
+        if enc_id == 0:
+            pass
+        elif enc_id == 64:
+            data_count.append(binutils.get_triad(data[0:3]))
+            data = data[3:]
+        elif enc_id == 96:
+            data_count.append(binutils.get_triad(data[0:3]))
+            data = data[7:]  # Unknown, just skip it ;)
+        else:
+            log.debug('Unknown enc_id found')
+            log.debug(binascii.hexlify(data))
+            data = b''  # TODO: ;)
 
-            print(len(self.data), self.data)
-            self.data = b''
+        packets.append(data[:length])
+        data = data[length:]
+    return {'packets': packets, 'packet_count': packet_count, 'data_count': data_count}

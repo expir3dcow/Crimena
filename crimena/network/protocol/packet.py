@@ -9,6 +9,7 @@ class Packet(object):
     def __init__(self, server):
         self.buffer = bytearray()
         self.server = server
+        self.debug = []
 
     @abc.abstractmethod
     def encode(self):
@@ -38,18 +39,42 @@ class Packet(object):
             self.buffer = bytearray()
             return r
 
+    # byte
     def get_byte(self):
         return binutils.get_byte(self.get(1))
 
     def put_byte(self, i):
         self.buffer.extend(binutils.put_byte(i))
 
+    # short
     def get_short(self):
         return binutils.get_short(self.get(2))
 
     def put_short(self, i):
         self.buffer.extend(binutils.put_short(i))
 
+    # triad
+    def get_triad(self):
+        return binutils.get_triad(self.get(3))
+
+    def put_triad(self, i):
+        self.buffer.extend(binutils.put_triad(i))
+
+    # int
+    def get_int(self):
+        return binutils.get_int(self.get(4))
+
+    def put_int(self, i):
+        self.buffer.extend(binutils.put_int(i))
+
+    # float
+    def get_float(self):
+        return binutils.get_float(self.get(4))
+
+    def put_float(self, i):
+        self.buffer.extend(binutils.put_float(i))
+
+    # long
     def get_long(self):
         return binutils.get_long(self.get(8))
 

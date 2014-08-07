@@ -13,7 +13,7 @@ def load_packets():
 
         packet_files = filter(pysearchre.search,
                               os.listdir(os.path.join(os.path.dirname(__file__),
-                                                      'protocol', packet)))
+                                                      '../network/protocol', packet)))
         form_module = lambda fp: '.' + os.path.splitext(fp)[0]
         packets_map = map(form_module, packet_files)
 

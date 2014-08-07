@@ -27,3 +27,14 @@ def test_triad():
 
     assert_equals(tools.put_triad(1234), b'\x00\x04\xd2')
     assert_equals(tools.put_triad(5678, False), b'\x2e\x16\x00')
+
+
+def test_int():
+    assert_equals(tools.get_int(b'\x00\x00\x00\x00'), 0)
+    assert_equals(tools.get_int(b'\x00\x00\x00\x01'), 1)
+    assert_equals(tools.put_int(362), b'\x00\x00\x01\x6a')
+
+
+def test_float():
+    assert_equals(tools.get_float(b'\x3f\x80\x00\x00'), 1.0)
+    assert_equals(tools.put_float(3.14), b'\x40\x48\xf5\xc3')

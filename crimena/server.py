@@ -3,13 +3,15 @@ import os
 import time
 import struct
 from crimena.config.properties import Properties
+from crimena.entity.handler import EntityHandler
 from crimena.network.network import Network
 from crimena.utils.logger import setup_logger
+from crimena.utils.singleton import Singleton
 
 log = logging.getLogger('Crimena')
 
 
-class Server(object):
+class Server(metaclass=Singleton):
     """Main Server class"""
 
     def __init__(self):
@@ -20,6 +22,7 @@ class Server(object):
         self.server_network = Network(self)
         self.server_start_time = time.time() * 1000
         self.server_id = struct.unpack("!Q", os.urandom(8))[0]
+        self.server_entities = EntityHandler(self)
 
         self.isrunning = True
 

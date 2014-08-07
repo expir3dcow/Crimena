@@ -27,6 +27,20 @@ def put_triad(a, big=True):
     else:
         return pack('<i', a)[:3]
 
+# int
+def get_int(a):
+    return unpack('>i', a)[0]
+
+def put_int(a):
+    return pack('>i', a)
+
+# float
+def get_float(a):
+    return unpack('>f', a)[0]
+
+def put_float(a):
+    return pack('>f', a)
+
 # long
 def get_long(a):
     return unpack('>Q', a)[0]
