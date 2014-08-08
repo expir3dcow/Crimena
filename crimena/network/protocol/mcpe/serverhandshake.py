@@ -7,8 +7,7 @@ class ServerHandshake(Packet):
 
     def __init__(self, data):
         Packet.__init__(self, data)
-        self.security = None
-        self.cookie = None
+        self.cookie_security = None
         self.port = None
         self.session1 = None
         self.session2 = None
@@ -16,8 +15,7 @@ class ServerHandshake(Packet):
     def encode(self):
         self.put_byte(info['pid'])
 
-        self.put_byte(self.security)
-        self.put_int(self.cookie)
+        self.put(self.cookie_security)
         self.put_short(self.port)
         self.put(b'\x00\x00\x04\xff\xff\xff\xff'*10)
         self.put_byte(1)

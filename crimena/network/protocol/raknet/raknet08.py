@@ -7,13 +7,13 @@ info = {
 
 
 class Raknet08(Packet):
-    """Packet structure
-        packet_id: byte
-        magic: 16 bytes
-        server_id: long
-        client_port: short
-        mtu_size: short
-        security: byte
+    """ID_OPEN_CONNECTION_REPLY_2
+        packet_id:  Header(1)
+        magic:      OfflineMesageID(16)
+        server_id:  server GUID(8)
+        lient_port: mtu(2)
+        security:   doSecurity(1 bit)
+            handshakeAnswer (if do security is true).
     """
 
     def __init__(self, server):

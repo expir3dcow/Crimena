@@ -92,7 +92,7 @@ class Packet(object):
 
     def get_string(self):
         length = binutils.get_short(self.get(2))
-        return binutils.get_short(self.get(length))
+        return self.get(length).decode('utf-8')
 
     def put_string(self, i):
         self.buffer.extend(binutils.put_string(i))

@@ -7,12 +7,15 @@ info = {
 
 
 class Raknet06(Packet):
-    """Packet structure
-        packet_id: byte
-        magic: 16 bytes
-        server_id: long
-        security: byte
-        mtu_size: short
+    """ID_OPEN_CONNECTION_REPLY_1
+    packet_id:  Header(1)
+    magic:      OfflineMesageID(16)
+    server_id:  server GUID(8)
+    security:   HasSecurity(1)
+    mtu_size:   MTU(2).
+
+    If public key fails on client
+        returns ID_PUBLIC_KEY_MISMATCH
     """
 
     def __init__(self, server):

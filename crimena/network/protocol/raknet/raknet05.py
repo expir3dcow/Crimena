@@ -8,11 +8,15 @@ info = {
 
 
 class Raknet05(Packet):
-    """Packet structure
-        packet_id: byte
-        magic: 16 bytes
-        protocol_version: byte
-        mtu_size: short
+    """ID_OPEN_CONNECTION_REQUEST_1
+        packet_id:          Header(1)
+        magic:              OfflineMesageID(16)
+        protocol_version:   Protocol number(1)
+        mtu_size:           Pad(toMTU)
+
+        sent with no fragment set.
+        If protocol fails on server,
+            returns ID_INCOMPATIBLE_PROTOCOL_VERSION to client
     """
 
     def __init__(self, server):

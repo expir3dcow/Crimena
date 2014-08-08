@@ -8,10 +8,10 @@ info = {
 
 class Raknet1c(Packet):
     """Packet structure
-        packet_id: byte
-        ping_id: long
-        server_id: long
-        magic: 16 bytes
+        packet_id: Header(1)
+        ping_id: client GUID(8)
+        server_id: server GUID(8)
+        magic: OfflineMesageID(16)
         identifier: string
     """
 

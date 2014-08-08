@@ -15,7 +15,7 @@ class Ping(Packet):
         self.put_long(self.time)
 
     def decode(self):
-        time = self.get_long()
+        self.time = self.get_long()
 
 
 def init(data):

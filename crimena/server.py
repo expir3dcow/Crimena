@@ -35,9 +35,19 @@ class Server(metaclass=Singleton):
 
         self.gameloop()
 
+    def stop(self):
+        print('TODO: save and kick players')
+        print('TODO: stop network listener')
+        self.server_network.stop()
+
+        print('TODO: save world')
+        print('TODO: save config files')
+        self.isrunning = False
+        pass
+
     def gameloop(self):
         while self.isrunning:
-            time.sleep(10)
+            time.sleep(10)  # TODO: xD
 
     def get_time_since_start(self):
         return int(time.time()*1000 - self.server_start_time)

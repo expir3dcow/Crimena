@@ -53,8 +53,7 @@ def test_raknet07():
                  b'\x05\xa6\xff\xff\xff\xff\xab\x06\x69\x95'
     pkt.decode()
     assert_equals(pkt.magic, magic)
-    assert_equals(pkt.security, 4)
-    assert_equals(pkt.cookie, b'\x3f\x57\xff\xf4')
+    assert_equals(pkt.cookie_security, b'\x04\x3f\x57\xff\xf4')
     assert_equals(pkt.server_port, 19132)
     assert_equals(pkt.mtu_size, 1446)
     assert_equals(pkt.client_id, 18446744072283908501)

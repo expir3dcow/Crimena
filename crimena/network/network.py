@@ -3,6 +3,7 @@ from queue import Queue
 import socket
 import threading
 import binascii
+import time
 
 from crimena.network.handler import Handler
 from crimena.utils.packetloader import load_packets
@@ -28,23 +29,31 @@ class Network(threading.Thread):
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind((self.server_ip, self.server_port))
+        self.sock.settimeout(1)
+        self.isrunning = True
 
     def run(self):
         self.packets = load_packets()
         log.debug('Loaded {} raknet and {} mcpe packets'.format(len(self.packets['raknet']), len(self.packets['mcpe'])))
 
-        t = threading.Thread(target=Handler, args=([self, self.server, self.data_in, ]))
-        t.daemon = True
-        t.start()
+        handler = Handler(self, self.server, self.data_in)
+        handler.start()
 
-        while True:
-            data, addr = self.sock.recvfrom(2048)
-            self.data_in.put([data, addr])
+        while self.isrunning:
+            try:
+                data, addr = self.sock.recvfrom(2048)
+                self.data_in.put([data, addr])
+            except socket.timeout:
+                pass
+
+        print('Stopping %s' % self.name)
+        self.sock.close()
 
     def send_raknet(self, buffer, addr):
-        log.debug('< S: size: {:>4} raknet: {!s:>8}'.format(len(buffer), binascii.hexlify(buffer[:40])))
+        log.debug('< S: size: {:>4} {!s:>8}'.format(len(buffer), binascii.hexlify(buffer[:40])))
         self.sock.sendto(buffer, addr)
 
     def stop(self):
         log.info('Stopping Network socket')
-        self.sock.close()
+        self.isrunning = False
+        time.sleep(1)

@@ -8,10 +8,10 @@ info = {
 
 
 class Raknet01(Packet):
-    """Packet structure
-        packet_id: byte
-        ping_id: long
-        magic: 16 bytes
+    """ID_CONNECTED_PING_OPEN_CONNECTIONS
+        packet_id:  byte
+        ping_id:    long
+        magic:      OfflineMesageID(16)
     """
 
     def __init__(self, server):
